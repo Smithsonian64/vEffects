@@ -1,8 +1,11 @@
+import time
+
 import numpy
 import pygame
 import sys
 import random
 import myutils
+import transition
 
 class Trappedknight:
     def __init__(self, screen, size):
@@ -15,8 +18,9 @@ class Trappedknight:
 
         self.moves = self.generatemoves()
         self.colorangle = myutils.randomangle()
-        
-        
+        self.canvas = pygame.Surface((10000, 10000))
+
+        self.trans = transition.Transition(self.canvas)
 
 
         for i in range(0, len(self.squares)):
@@ -57,7 +61,7 @@ class Trappedknight:
             self.reinit()
             return
 
-        pygame.draw.line(self.screen, 
+        pygame.draw.line(self.canvas,
                         (int(127*(numpy.cos(0.2*self.colorangle)+1)), int(127*(numpy.sin(0.5*self.colorangle)+1)), numpy.abs(int(127*(numpy.cos(0.9*self.colorangle)+1)))), 
                         (int(self.position[0]*self.xfactor), int(self.position[1]*self.yfactor)), 
                         (int(nextposition[0]*self.xfactor), int(nextposition[1]*self.yfactor)))
@@ -70,12 +74,19 @@ class Trappedknight:
 
         self.colorangle += myutils.degrees(1) / 15
 
+        self.trans.step()
+        self.screen.blit(self.canvas, (0, 0))
+
+
+
     def reinit(self):
         self.squares = self.makespiral(self.size)
         self.moves = self.generatemoves()
         self.colorangle = myutils.randomangle()
-        self.screen.fill((0, 0, 0))
-        pygame.display.update()
+        #self.trans.starttransition(self.canvas, 1)
+        self.canvas.fill((0, 0, 0))
+
+        #pygame.display.update()
 
 
         for i in range(0, len(self.squares)):

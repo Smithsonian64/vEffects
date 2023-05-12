@@ -1,17 +1,26 @@
 import numpy
 import pygame
 
-class Transition():
+
+class Transition:
     def __init__(self, screen):
+        self.frames = 0
+        self.start = 0
+        self.fadeimage = None
         self.screen = screen
-        self.fadesurface = pygame.Surface(screen.get_size())
-        self.fadesurface.blit(self.screen, (0,0))
-        self.screen.blit(self.fadesurface, (0,0))
+        self.transitioning = False
 
-        
     def step(self):
-        for i in range(0, self.fadesurface.get_width()):
-            for j in range(0, self.fadesurface.get_height()):
-                    self.fadesurface.set_at((i, j), self.fadesurface.get_at((i, j))[3])
+        if self.frames > 0:
+            self.fadeimage.set_alpha(int(255 - (self.start - self.frames) * 255 / self.start))
+            self.screen.blit(self.fadeimage, (0, 0))
+            self.frames -= 1
+        else:
+            self.transitioning = False
 
-        self.screen.blit(self.fadesurface, (0,0))
+    def starttransition(self, screen, frames):
+        if not self.transitioning:
+            self.frames += frames
+            self.start = frames
+            self.fadeimage = screen.copy()
+            self.transitioning = True
